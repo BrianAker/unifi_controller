@@ -1,0 +1,6 @@
+---
+# handlers file for unifi_controller
+- name: unifi-controller
+  service:
+    name: unifi
+    state: restarted

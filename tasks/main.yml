@@ -1,0 +1,47 @@
+---
+# tasks file for unifi_controller
+
+# Add specified repository into sources list.
+- name: Add Ubnt Debian repository
+  apt_repository: 
+    repo: 'deb http://www.ubnt.com/downloads/unifi/debian unifi5 ubiquiti'
+    state: present
+  become: true
+
+- name: Add key for Ubnt Repository
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    state: present
+    id: C0A52C50
+  become: true
+  notify: unifi-controller
+  register: apt_key_result
+
+- name: Upgrade apt dist
+  apt:
+    upgrade: dist
+    state: latest
+  when: apt_key_result|succeeded
+  become: true
+  notify: unifi-controller
+  tags: upgrade
+
+- name: Install mongodb
+  apt:
+    name: mongodb
+    state: present
+  become: true
+  notify: unifi-controller
+
+- name: Install Unifi
+  apt:
+    name: unifi
+    state: present
+  become: true
+  notify: unifi-controller
+
+- name: Enable Unifi Service
+  service:
+    name: unifi
+    enabled: true
+  notify: unifi-controller
